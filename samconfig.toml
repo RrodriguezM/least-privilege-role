@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "least-privilege-role"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-nyt2w42xlyal"
+s3_prefix = "least-privilege-role"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"

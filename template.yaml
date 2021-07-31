@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  least-privilege-role
+
+  Sample SAM Template for least-privilege-role
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 5
+
+
+Resources:
+  ApiBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: apibucketleastprivilege
+  
+  ListObjectsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: './list_objects'
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Policies:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: '*'
+            Resource: '*'
+      Events:
+        HelloWorld:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /listobjects
+            Method: get
+
+  ApiGetObjectRoleArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: '/least_privilege/bucket_name'
+      Type: String
+      Value: !Ref ApiBucket
+      Description: Bucket Name for least privilege Article
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  ListObjectsApi:
+    Description: "API Gateway endpoint URL Least Privilege Role Article"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/listobjects/"
+  ListObjectsFunction:
+    Description: "ListObjectsFunction Lambda Function ARN"
+    Value: !GetAtt ListObjectsFunction.Arn
+  ListObjectsIamRole:
+    Description: "Implicit IAM Role created for ListObjectsFunction function"
+    Value: !GetAtt ListObjectsFunctionRole.Arn
